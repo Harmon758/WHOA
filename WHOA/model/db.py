@@ -9,7 +9,7 @@ class WHOADatabase(PyMongo):
 		self.communities = self.db.communities
 	
 	def add_community(self, **kwargs):
-		for required_field in ("name", "admin_username", "admin_password"):
+		for required_field in ("name", "admin_email", "admin_password"):
 			if required_field not in kwargs:
 				raise DatabaseException(f"Required field: {required_field}")
 		result = self.communities.insert_one(kwargs)
@@ -35,6 +35,6 @@ class DatabaseException:
 
 if __name__ == "__main__":
 	db = WHOADatabase(Flask(__name__))
-	community = db.add_community(name = "HOA1", admin_username = "Bob", admin_password = "badpassword")
+	community = db.add_community(name = "HOA1", admin_email = "Bob@bob.com", admin_password = "badpassword")
 	community.add_user(name = "Joe", email = "Joe@joe.com", password = "goodpassword", address = "666 Sixth Street. #6", phone_number = "666-666-6666")
 
