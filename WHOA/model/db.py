@@ -26,6 +26,12 @@ class WHOADatabase(PyMongo):
 			raise DatabaseException(f"Invite code not found")
 		community_collection = self.db[str(document["_id"])]
 		return WHOACommunity(community_collection)
+	
+	def check_admin_password(self, admin_email, admin_password):
+		document = self.communities.find_one({"admin_email": admin_email})
+		if not document:
+			raise DatabaseException("Admin email not found")
+		return admin_password == document["admin_password"]
 
 
 class WHOACommunity:
@@ -51,4 +57,6 @@ if __name__ == "__main__":
 	community = db.add_community(name = "HOA1", admin_email = "Bob@bob.com", admin_password = "badpassword", invite_code = "abc")
 	community.add_user(name = "Joe", email = "Joe@joe.com", password = "goodpassword", address = "666 Sixth Street. #6", phone_number = "666-666-6666")
 	community = db.get_community("abc")
+	assert db.check_admin_password("Bob@bob.com", "badpassword")
+	assert not db.check_admin_password("Bob@bob.com", "password")
 
