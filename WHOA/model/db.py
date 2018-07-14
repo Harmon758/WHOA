@@ -12,6 +12,8 @@ class WHOADatabase(PyMongo):
 		for required_field in ("name", "admin_email", "admin_password", "invite_code"):
 			if required_field not in kwargs:
 				raise DatabaseException(f"Required field: {required_field}")
+		if self.communities.find_one({"name": kwargs["name"]}):
+			raise DatabaseException("Duplicate community name")
 		if self.communities.find_one({"admin_email": kwargs["admin_email"]}):
 			raise DatabaseException("Duplicate admin email")
 		if self.communities.find_one({"invite_code": kwargs["invite_code"]}):
