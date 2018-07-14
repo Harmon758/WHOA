@@ -12,6 +12,8 @@ class WHOADatabase(PyMongo):
 		for required_field in ("name", "admin_email", "admin_password"):
 			if required_field not in kwargs:
 				raise DatabaseException(f"Required field: {required_field}")
+		if self.communities.find_one({"admin_email": kwargs["admin_email"]}):
+			raise DatabaseException("Duplicate admin email")
 		result = self.communities.insert_one(kwargs)
 		community_collection = self.db.create_collection(str(result.inserted_id))
 		return WHOACommunity(community_collection)
@@ -26,6 +28,8 @@ class WHOACommunity:
 		for required_field in ("name", "email", "password", "address", "phone_number"):
 			if required_field not in kwargs:
 				raise DatabaseException(f"Required field: {required_field}")
+		if self.collection.find_one({"email": kwargs["email"]}):
+			raise DatabaseException("Duplicate email")
 		self.collection.insert_one(kwargs)
 
 
