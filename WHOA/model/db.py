@@ -9,11 +9,13 @@ class WHOADatabase(PyMongo):
 		self.communities = self.db.communities
 	
 	def add_community(self, **kwargs):
-		for required_field in ("name", "admin_email", "admin_password"):
+		for required_field in ("name", "admin_email", "admin_password", "invite_code"):
 			if required_field not in kwargs:
 				raise DatabaseException(f"Required field: {required_field}")
 		if self.communities.find_one({"admin_email": kwargs["admin_email"]}):
 			raise DatabaseException("Duplicate admin email")
+		if self.communities.find_one({"invite_code": kwargs["invite_code"]}):
+			raise DatabaseException("Duplicate invite code")
 		result = self.communities.insert_one(kwargs)
 		community_collection = self.db.create_collection(str(result.inserted_id))
 		return WHOACommunity(community_collection)
