@@ -35,6 +35,9 @@ class WHOADatabase(PyMongo):
 		community_collection = self.db[str(document["_id"])]
 		return WHOACommunity(community_collection)
 	
+	def list_communities(self):
+		return self.communities.distinct("name")
+	
 	def check_admin_password(self, admin_email, admin_password):
 		document = self.communities.find_one({"admin_email": admin_email})
 		if not document:
@@ -75,4 +78,5 @@ if __name__ == "__main__":
 	assert not db.check_admin_password("Bob@bob.com", "password")
 	assert community.check_user_password("Joe@joe.com", "goodpassword")
 	assert not community.check_user_password("Joe@joe.com", "password")
+	assert db.list_communities() == ["HOA1"]
 
