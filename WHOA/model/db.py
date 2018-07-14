@@ -41,6 +41,6 @@ class DatabaseException(Exception):
 
 if __name__ == "__main__":
 	db = WHOADatabase(Flask(__name__))
-	community = db.add_community(name = "HOA1", admin_email = "Bob@bob.com", admin_password = "badpassword")
+	community = db.add_community(name = "HOA1", admin_email = "Bob@bob.com", admin_password = "badpassword", invite_code = "abc")
 	community.add_user(name = "Joe", email = "Joe@joe.com", password = "goodpassword", address = "666 Sixth Street. #6", phone_number = "666-666-6666")
 
