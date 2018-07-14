@@ -1,0 +1,27 @@
+{% extends "layout.html" -%}
+{% block body -%}
+
+<div class="ui raised very padded text container segment">
+  <h2 class="ui header">Error</h2>
+  <p> {{ error }}</p>
+</div>
+
+<style type="text/css">
+	body {
+		background-color: #DADADA;
+	}
+
+	body>.grid {
+		height: 100%;
+	}
+
+	.image {
+		margin-top: -100px;
+	}
+
+	.column {
+		max-width: 450px;
+	}
+</style>
+
+{% endblock %}
