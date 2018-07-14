@@ -99,16 +99,14 @@ def logout():
 @app.route("/register", methods=("GET", "POST"))
 def register():
     if request.method == "POST":
-        validate_form(dict(request.form))
+        validate_form(dict(request.form), "register", db_connector)
     return render_template("register.html")
 
 
 @app.route("/register-community", methods=("GET", "POST"))
 def register_community():
     if request.method == "POST":
-        print(dict(request.form))
         errors = validate_form(dict(request.form), "register-community", db_connector)
-        print(errors)
         if errors:
             for error in errors:
                 flash(error)
@@ -119,8 +117,16 @@ def register_community():
 
 @app.route('/communities/<string:community_name>')
 def community_dashboard(community_name):
-    print(community_name)
+    try:
+        community = db_connector.get_community(community_name)
+    except db.DatabaseException as e:
+        return error(f"Unable to find community {community_name}")
+    return render_template("communities.html", community_data=community)
     
+
+@app.route("/error")
+def error(error_message):
+    return render_template("error.html", error=error_message)
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
