@@ -29,7 +29,7 @@ class WHOACommunity:
 		self.collection.insert_one(kwargs)
 
 
-class DatabaseException:
+class DatabaseException(Exception):
 	pass
 
 
