@@ -54,6 +54,12 @@ class WHOACommunity:
 		if self.collection.find_one({"email": kwargs["email"]}):
 			raise DatabaseException("Duplicate email")
 		self.collection.insert_one(kwargs)
+	
+	def check_user_password(self, email, password):
+		document = self.collection.find_one({"email": email})
+		if not document:
+			raise DatabaseException("Email not found")
+		return password == document["password"]
 
 
 class DatabaseException(Exception):
@@ -67,4 +73,6 @@ if __name__ == "__main__":
 	community = db.get_community(invite_code = "abc")
 	assert db.check_admin_password("Bob@bob.com", "badpassword")
 	assert not db.check_admin_password("Bob@bob.com", "password")
+	assert community.check_user_password("Joe@joe.com", "goodpassword")
+	assert not community.check_user_password("Joe@joe.com", "password")
 
