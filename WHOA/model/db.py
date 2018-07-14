@@ -19,6 +19,13 @@ class WHOADatabase(PyMongo):
 		result = self.communities.insert_one(kwargs)
 		community_collection = self.db.create_collection(str(result.inserted_id))
 		return WHOACommunity(community_collection)
+	
+	def get_community(self, invite_code):
+		document = self.communities.find_one({"invite_code": invite_code})
+		if not document:
+			raise DatabaseException(f"Invite code not found")
+		community_collection = self.db[str(document["_id"])]
+		return WHOACommunity(community_collection)
 
 
 class WHOACommunity:
@@ -43,4 +50,5 @@ if __name__ == "__main__":
 	db = WHOADatabase(Flask(__name__))
 	community = db.add_community(name = "HOA1", admin_email = "Bob@bob.com", admin_password = "badpassword", invite_code = "abc")
 	community.add_user(name = "Joe", email = "Joe@joe.com", password = "goodpassword", address = "666 Sixth Street. #6", phone_number = "666-666-6666")
+	community = db.get_community("abc")
 
