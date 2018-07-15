@@ -1,0 +1,48 @@
+{% extends "dashboard.html" -%}
+{% set active_page = "overview" %}
+{% block row -%}
+<div class="row">
+	<h1 class="ui huge header">
+		Dashboard
+	</h1>
+</div>
+<div class="ui divider"></div>
+<div class="four column center aligned row">
+	<div class="column">
+		<div class="ui hidden divider"></div>
+		<div class="ui large button green">
+			Manage Users
+		</div>
+		<p>
+			Moderate Residential Community Users
+		</p>
+	</div>
+	<div class="column">
+		<div class="ui hidden divider"></div>
+		<div class="ui large button blue">
+			View Properties
+		</div>
+		<p>
+			View Real Estate and Property Data
+		</p>
+	</div>
+	<div class="column">
+		<div class="ui hidden divider"></div>
+		<div class="ui large button pink">
+			Manage Smart Devices
+		</div>
+		<p>
+			View what smart devices are authorized for use within the community
+		</p>
+	</div>
+	<div class="column">
+		<div class="ui hidden divider"></div>
+		<div class="ui large button red">
+			Moderate Notice Board
+		</div>
+		<p>
+			Manage the community's noticeboard
+		</p>
+	</div>
+</div>
+{% endblock %}
