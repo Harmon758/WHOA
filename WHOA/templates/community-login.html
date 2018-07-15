@@ -1,0 +1,158 @@
+{% extends "layout.html" -%}
+{% block body -%}
+<ul class="tab-group">
+	<li class="tab active">
+		<a href="#user-login">User Login</a>
+	</li>
+	<li class="tab">
+		<a href="#admin-login">Admin Login</a>
+	</li>
+</ul>
+<div class="ui middle aligned center aligned grid">
+	<div class="form">
+		<div class="tab-content">
+			<div id="user-login">
+				<h2 class="ui teal header">
+					<!-- img class="image" src="{{ url_for('static', filename='logo.png') }}" / -->
+					<div align="center" class="content">
+						Login to view your community ( {{ community_name }})
+					</div>
+				</h2>
+
+				<form method="POST" class="ui large form">
+					<div class="ui stacked segment">
+                        {% with errors = get_flashed_messages() -%} 
+                        {% if errors %}
+                        <ul>
+                            {% for error in errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {%- endif %} 
+                        {%- endwith -%}
+						<div class="field">
+							<div class="ui left icon input">
+								<i class="user icon"></i>
+								<input id="user_email" name="user_email" placeholder="E-mail address" type="text" required />
+							</div>
+						</div>
+						<div class="field">
+							<div class="ui left icon input">
+								<i class="lock icon"></i>
+								<input id="user_password" name="user_password" placeholder="Password" type="password" required />
+							</div>
+						</div>
+						<input type="submit" value="Login" name="user_submit" id="user_submit" class="ui fluid large teal button"></input>
+					</div>
+					<div class="ui error message"></div>
+				</form>
+			</div>
+
+			<div id="admin-login">
+				<h2 class="ui teal header">
+					<!-- img class="image" src="{{ url_for('static', filename='logo.png') }}" / -->
+					<div align="center" class="content">
+						Login to manage your community ( {{ community_name }})
+					</div>
+				</h2>
+
+				<form method="POST" class="ui large form">
+					<div class="ui stacked segment">
+						{% with errors = get_flashed_messages() -%} 
+						{% if errors %}
+						<ul>
+							{% for error in errors %}
+							<li>{{ error }}</li>
+							{% endfor %}
+						</ul>
+						{%- endif %} 
+						{%- endwith -%}
+						<div class="field">
+							<div class="ui left icon input">
+								<i class="user icon"></i>
+								<input id="admin_email" name="admin_email" placeholder="E-mail address" type="text" required />
+							</div>
+						</div>
+						<div class="field">
+							<div class="ui left icon input">
+								<i class="lock icon"></i>
+								<input id="admin_password" name="admin_password" placeholder="Password" type="password" required />
+							</div>
+						</div>
+						<input type="submit" value="Login" name="admin_submit" id="admin_submit" class="ui fluid large teal button"></input>
+                    </div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<style type="text/css">
+	body {
+		background-color: #DADADA;
+	}
+
+	body>.grid {
+		height: 10%;
+	}
+
+	.image {
+		margin-top: -100px;
+	}
+
+	.column {
+		max-width: 300px;
+	}
+
+	.tab-group {
+		list-style: none;
+		padding: 0;
+		margin: 0 0 40px 0;
+	}
+
+	.tab-group:after {
+		content: "";
+		display: table;
+		clear: both;
+	}
+
+	.tab-group li a {
+		display: block;
+		text-decoration: none;
+		padding: 15px;
+		background: rgba(160, 179, 176, 0.25);
+		color: #a0b3b0;
+		font-size: 20px;
+		float: left;
+		width: 50%;
+		text-align: center;
+		cursor: pointer;
+		transition: .5s ease;
+	}
+
+	.tab-group li a:hover {
+		background: #009c95;
+		color: #ffffff;
+	}
+
+	.tab-group .active a {
+		background: #009c95;
+		color: #ffffff;
+	}
+</style>
+<script src=" {{ url_for('static', filename='js/login.js') }}" <script>
+	$(document).ready(function () {
+		var user_submit_button = $("#user_submit").click(function () {
+			if (document.forms[0].checkValidity()) {
+				document.forms[0].submit();
+			}
+		});
+
+		var admin_submit_button = $("#admin_submit").click(function () {
+			if (document.forms[1].checkValidity()) {
+				document.forms[1].submit();
+			}
+		});
+
+	});
+</script>
+{% endblock %}
