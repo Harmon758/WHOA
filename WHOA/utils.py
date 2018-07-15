@@ -51,7 +51,7 @@ def validate_register_form(form, db_connector):
 				invite_code=form["referral"][0]
 			)
 		else:
-			community = db_connector.get_community(invite_code = form["invite_code"])
+			community = db_connector.get_community(invite_code = form["invite_code"][0])
 			community.add_user(
 				name=f"{form['first_name'][0]} {form['last_name'][0]}",
 				email=form["user_email"][0],
