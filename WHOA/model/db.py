@@ -60,7 +60,7 @@ class WHOADatabase(PyMongo):
 						kwargs["address"], kwargs["phone_number"], kwargs["community"])
 	
 	def get_user(self, email):
-		document = self.users.find_one({"email": kwargs["email"]})
+		document = self.users.find_one({"email": email})
 		if not document:
 			raise DatabaseException("User not found")
 		return WHOAUser(document["name"], document["email"], document["password"], 
