@@ -100,7 +100,7 @@ def register():
 			return redirect(f"/communities/{request.form['community_name']}/admin")
 		else:
 			community = db_connector.get_community(invite_code = request.form["invite_code"])
-			db_connector.add_user(
+			user = db_connector.add_user(
 				name=f"{request.form['first_name']} {request.form['last_name']}",
 				email=request.form["user_email"],
 				password=request.form["user_password"],
@@ -108,6 +108,7 @@ def register():
 				phone_number=request.form["phone_number"],
 				community=community["name"]
 			)
+			login_user(user)
 			return redirect(f"/communities/{community['name']}")
 	except db.DatabaseException as e:
 		flash(str(e))
