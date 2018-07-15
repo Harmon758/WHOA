@@ -77,7 +77,7 @@
 								<input name="invite_code" placeholder="Invite Code" type="text" required />
 							</div>
 						</div>
-						<input type="submitter" value="Register" name="submitter" id="submitter" class="ui fluid large teal button"></input>
+						<input type="submit" value="Register" name="user_submit" id="user_submit" class="ui fluid large teal button"></input>
 					</div>
 					<div class="ui error message"></div>
 				</form>
@@ -111,26 +111,26 @@
 						<div class="field">
 							<div class="ui left icon input">
 								<i class="user icon"></i>
-								<input id="community_email" name="email" placeholder="E-mail address" type="text" required />
+								<input id="admin_email" name="email" placeholder="E-mail address" type="text" required />
 							</div>
 						</div>
 						<div class="field">
 							<div class="ui left icon input">
 								<i class="check icon"></i>
-								<input name="community_email_confirm" placeholder="Verify E-mail address" type="text" data-rule-email="true" data-rule-equalTo="#email"
+								<input name="admin_email_confirm" placeholder="Verify E-mail address" type="text" data-rule-email="true" data-rule-equalTo="#email"
 								    required />
 							</div>
 						</div>
 						<div class="field">
 							<div class="ui left icon input">
 								<i class="lock icon"></i>
-								<input id="community_password" name="password" placeholder="Password" type="password" required />
+								<input id="admin_password" name="password" placeholder="Password" type="password" required />
 							</div>
 						</div>
 						<div class="field">
 							<div class="ui left icon input">
 								<i class="check icon"></i>
-								<input name="community_password_confirm" placeholder="Verify Password" type="password" data-rule-password="true" data-rule-equalTo="#password"
+								<input name="admin_password_confirm" placeholder="Verify Password" type="password" data-rule-password="true" data-rule-equalTo="#password"
 								    required />
 							</div>
 						</div>
@@ -140,7 +140,7 @@
 								<input name="referral" placeholder="Community Referral Code" type="text" required />
 							</div>
 						</div>
-						<input type="submit" value="Register" name="submit" id="submit" class="ui fluid large teal button"></input>
+						<input type="submit" value="Register" name="admin_submit" id="admin_submit" class="ui fluid large teal button"></input>
 					</div>
 					<div class="ui message">
 						Note: You will become the administrator for this new community.
@@ -205,11 +205,18 @@
 </style>
 <script src=" {{ url_for('static', filename='js/register.js') }}" <script>
 	$(document).ready(function () {
-		var submit_button = $("#submitter").click(function () {
+		var user_submit_button = $("#user_submit").click(function () {
 			if (document.forms[0].checkValidity()) {
 				document.forms[0].submit();
 			}
-		})
+		});
+
+		var admin_submit_button = $("#admin_submit").click(function () {
+			if (document.forms[1].checkValidity()) {
+				document.forms[1].submit();
+			}
+		});
+
 	});
 </script>
 {% endblock %}
