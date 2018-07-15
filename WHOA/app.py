@@ -143,7 +143,7 @@ def community_dashboard(community_name):
 		community = db_connector.get_community(community_name)
 	except db.DatabaseException as e:
 		return error(f"Unable to find community {community_name}")
-	return render_template("communities.html", community_data=community)
+	return render_template("overview.html", community_data=community)
 
 
 @app.route("/communities/<string:community_name>/noticeboard", methods=("GET", "POST"))
