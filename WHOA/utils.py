@@ -16,7 +16,7 @@ def validate_login_form(form, db_connector, community_name):
 			community = db_connector.get_community(name = community_name)
 			valid = community.check_user_password(form["email"][0], form["password"][0])
 	except db.DatabaseException as e:
-		errors.append(e)
+		errors.append(str(e))
 	else:
 		if not valid:
 			errors.append("Password incorrect.")
@@ -60,5 +60,5 @@ def validate_register_form(form, db_connector):
 				phone_number=form["phone_number"][0]
 			)
 	except db.DatabaseException as e:
-		errors.append(e)
+		errors.append(str(e))
 	return errors
