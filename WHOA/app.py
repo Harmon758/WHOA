@@ -80,9 +80,11 @@ def logout():
 	return render_template("logout.html")
 """
 
-@app.route("/login")
+@app.route("/login", methods=("GET", "POST"))
 def login():
-	return render_template("login.html")
+	if request.method == "POST":
+		return redirect(f"/communities/{request.form['community']}/login")
+	return render_template("login.html", communities=db_connector.list_communities())
 	
 
 @app.route("/register", methods=("GET", "POST"))
@@ -145,25 +147,30 @@ def community_dashboard(community_name):
 @app.route("/communities/<string:community_name>/login", methods=("GET", "POST"))
 def community_login(community_name):
 	if request.method == "GET":
-		return render_template("login.html")
-	
-	if "@" not in request.form["email"]:
-		flash("Please enter a valid email.")
-		return redirect(url_for(f"/communities/{community_name}/login"))
-	
+		return render_template("community-login.html", community_name=community_name)
+		
+	if "admin_submit" in request.form:
+		if "@" not in request.form["admin_email"]:
+			flash("Please enter a valid email.")
+			return redirect(f"/communities/{community_name}/login")
+	else:
+		if "@" not in request.form["user_email"]:
+			flash("Please enter a valid email.")
+			return redirect(f"/communities/{community_name}/login")
 	try:
-		if request.form["is_admin"]:
-			valid = db_connector.check_admin_password(request.form["email"], request.form["password"])
+		
+		if "admin_submit" in request.form:
+			valid = db_connector.check_admin_password(request.form["admin_email"], request.form["admin_password"])
 		else:
-			community = db_connector.get_community(name = community_name)
-			valid = community.check_user_password(request.form["email"], request.form["password"])
+			community = db_connector.get_community(name=community_name)
+			valid = community.check_user_password(request.form["user_email"], request.form["user_password"])
 	except db.DatabaseException as e:
 		flash(str(e))
-		return redirect(url_for(f"/communities/{community_name}/login"))
+		return redirect(f"/communities/{community_name}/login")
 	
 	if not valid:
 		flash("Password incorrect.")
-		return redirect(url_for(f"/communities/{community_name}/login"))
+		return redirect(f"/communities/{community_name}/login")
 	
 	login_user()
 	return redirect(f"/communities/{community_name}")
