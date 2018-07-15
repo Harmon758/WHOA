@@ -28,6 +28,7 @@ from model import db
 
 app = Flask("angelhack")
 app.config["SECRET_KEY"] = "3871897312"
+app.url_map.strict_slashes = False
 
 login_manager = LoginManager()
 login_manager.init_app(app)
