@@ -24,6 +24,9 @@
 			<div class="ui feed">
 			{% for notice in noticeboard.list_notices() %}
 				<div class="event">
+					<div class="label">
+						<img src="{{ url_for('static', filename='default-user.png') }}">
+					</div>
 					<div class="content">
 						<div class="summary">
 							<a>{{ notice.poster }}</a> posted
