@@ -81,6 +81,10 @@ def logout():
 	return render_template("logout.html")
 """
 
+@app.route("/login")
+def login():
+	return render_template("login.html")
+	
 
 @app.route("/register", methods=("GET", "POST"))
 def register():
@@ -107,7 +111,7 @@ def community_dashboard(community_name):
 
 
 @app.route("/communities/<string:community_name>/login", methods=("GET", "POST"))
-def login(community_name):
+def community_login(community_name):
 	if request.method == "POST":
 		errors = validate_login_form(dict(request.form), db_connector, community_name)
 		if errors:
