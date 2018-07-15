@@ -148,18 +148,14 @@ def community_dashboard(community_name):
 def community_login(community_name):
 	if request.method == "GET":
 		return render_template("community-login.html", community_name=community_name)
-		
-	if "admin_submit" in request.form:
-		if "@" not in request.form["admin_email"]:
-			flash("Please enter a valid email.")
-			return redirect(f"/communities/{community_name}/login")
-	else:
-		if "@" not in request.form["user_email"]:
-			flash("Please enter a valid email.")
-			return redirect(f"/communities/{community_name}/login")
+	
+	is_admin = "admin_submit" in request.form
+	if (is_admin and "@" not in request.form["admin_email"]) or (not is_admin and "@" not in request.form["user_email"]):
+		flash("Please enter a valid email.")
+		return redirect(f"/communities/{community_name}/login")
+	
 	try:
-		
-		if "admin_submit" in request.form:
+		if is_admin:
 			valid = db_connector.check_admin_password(request.form["admin_email"], request.form["admin_password"])
 		else:
 			community = db_connector.get_community(name=community_name)
