@@ -45,12 +45,6 @@ def load_user(email):
 	except db.DatabaseException:
 		return
 
-"""
-@app.route("/logout")
-def logout():
-	logout_user()
-	return render_template("logout.html")
-"""
 
 @app.route("/")
 def index():
@@ -62,6 +56,13 @@ def login():
 	if request.method == "POST":
 		return redirect(f"/communities/{request.form['community']}/login")
 	return render_template("login.html", communities=db_connector.list_communities())
+
+
+@app.route("/logout")
+@login_required
+def logout():
+	logout_user()
+	return render_template("index.html")
 	
 
 @app.route("/register", methods=("GET", "POST"))
@@ -173,6 +174,7 @@ def community_login(community_name):
 @app.route("/error")
 def error(error_message):
 	return render_template("error.html", error=error_message)
+
 
 if __name__ == "__main__":
 	app.run(host="127.0.0.1", port=5000, debug=True)
