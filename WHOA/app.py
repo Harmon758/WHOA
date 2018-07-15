@@ -99,20 +99,16 @@ def logout():
 @app.route("/register", methods=("GET", "POST"))
 def register():
 	if request.method == "POST":
-		validate_form(dict(request.form), "register", db_connector)
-	return render_template("register.html")
-
-
-@app.route("/register-community", methods=("GET", "POST"))
-def register_community():
-	if request.method == "POST":
-		errors = validate_form(dict(request.form), "register-community", db_connector)
+		errors = validate_form(dict(request.form), "register", db_connector)
 		if errors:
 			for error in errors:
 				flash(error)
-			return redirect(url_for("register_community"))
-		return redirect(f"/communities/{request.form['community_name']}")
-	return render_template("register-community.html")
+			return redirect(url_for("register"))
+		if request.form["is_admin"]:
+			return redirect(f"/communities/{request.form['community_name']}/admin")
+		else:
+			return redirect(f"/communities/{request.form['community_name']}")
+	return render_template("register.html")
 
 
 @app.route('/communities/<string:community_name>')
