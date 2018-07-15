@@ -25,7 +25,7 @@ class WHOADatabase(PyMongo):
 		result = self.communities.insert_one(kwargs)
 		community_collection = self.db.create_collection(str(result.inserted_id))
 		noticeboard_collection = self.db.create_collection(f"{result.inserted_id}_nb")
-		return WHOACommunity(community_collection, WHOANoticeboard(noticeboard_collection))
+		return WHOACommunity(kwargs["name"], community_collection, WHOANoticeboard(noticeboard_collection))
 	
 	def get_community(self, name = None, invite_code = None):
 		if not (name or invite_code):
@@ -39,7 +39,7 @@ class WHOADatabase(PyMongo):
 			raise DatabaseException("Community not found")
 		community_collection = self.db[str(document["_id"])]
 		noticeboard_collection = self.db[f"{document['_id']}_nb"]
-		return WHOACommunity(community_collection, WHOANoticeboard(noticeboard_collection))
+		return WHOACommunity(document["name"], community_collection, WHOANoticeboard(noticeboard_collection))
 	
 	def list_communities(self):
 		return self.communities.distinct("name")
@@ -53,7 +53,8 @@ class WHOADatabase(PyMongo):
 
 class WHOACommunity:
 	
-	def __init__(self, collection, noticeboard):
+	def __init__(self, name, collection, noticeboard):
+		self.name = name
 		self.collection = collection
 		self.noticeboard = noticeboard
 	
