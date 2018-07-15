@@ -1,16 +1,15 @@
-{% extends "layout.html" -%}
-{% block body -%}
+{% extends "layout.html" -%} {% block body -%}
 <div class="ui large top fixed hidden menu">
-    <div class="ui container">
+    <div id="top" class="ui container">
         <a class="active item">Home</a>
         <a class="item">Communities</a>
-        <a class="item">Get Involved</a>
+        <a href="#getting-involved" class="item">Get Involved</a>
         <div class="right menu">
             <div class="item">
-                <a class="ui teal button">Log in</a>
+                <a href="{{ url_for('login') }}" class="ui teal button">Log in</a>
             </div>
             <div class="item">
-                <a class="ui primary button">Join A Community</a>
+                <a href="{{ url_for('register') }}" class="ui primary button">Signup</a>
             </div>
         </div>
     </div>
@@ -19,8 +18,9 @@
 <div class="ui vertical inverted sidebar menu">
     <a class="active item">Home</a>
     <a class="item">Communities</a>
-    <a class="item">Get Involved</a>
-    <a class="item">Join A Community</a>
+    <a href="#getting-involved" class="item">Get Involved</a>
+    <a href="{{ url_for('login') }}" class="item">Log in</a>
+    <a href="{{ url_for('register') }}" class="item">Signup</a>
 </div>
 <!--Page Contents-->
 <div class="pusher">
@@ -30,13 +30,12 @@
                 <a class="toc item">
                     <i class="sidebar icon"></i>
                 </a>
-                <a class="active item">Home</a>
-                <a class="item">Get Started</a>
-                <a class="item">Get Involved</a>
-                <a class="item">Join A Community</a>
+                <a href="#top" class="active item">Home</a>
+                <a class="item">Communities</a>
+                <a href="#getting-involved" class="item">Get Involved</a>
                 <div class="right item">
-                    <a class="ui inverted button" href="{{ url_for('login') }}">Login</a>
-                    <a class="ui inverted button" href="{{ url_for('register') }}">Join A Community</a>
+                    <a class="ui inverted button" href="{{ url_for('login') }}">Log in</a>
+                    <a class="ui inverted button" href="{{ url_for('register') }}">Signup</a>
                 </div>
             </div>
         </div>
@@ -50,24 +49,37 @@
         </div>
     </div>
     <div class="ui vertical stripe segment">
+        <div class="ui text container">
+            <h3 class="ui header">
+                Enhance your community!
+            </h3>
+            <p>
+                Do the members of your community feel disconnected, alone, or out of the loop? Tired of homeowners in your neighborhood playing
+                loud music or disregarding the rules of your community? Bring them together while enforcing a positive sense
+                of community with our platform!
+            </p>
+            <a class="ui large button">Read More</a>
+        </div>
+    </div>
+    <div class="ui vertical stripe segment">
         <div class="ui middle aligned stackable grid container">
             <div class="row">
                 <div class="eight wide column">
-                    <h3 class="ui header">
-                        Enhance your community!
+                    <h3 id="getting-involved" class="ui header">
+                        Getting Involved
                     </h3>
                     <p>
-                        Do the members of your community feel disconnected, alone, or out of the loop? Tired of homeowners in our neighborhood
-                        playing loud music or disregarding the rules of your community? Bring them together while enforcing a positive sense of
-                        community with our platform!
+                        Partner with WHOA today to bring your Homeowners Association into the future of social networking.
                     </p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="center aligned column">
-                    <div class="ui huge teal button">
-                        Get Started
-                        <i class="right arrow icon"></i>
+                    <div class="row">
+                        <div class="center aligned column">
+                            <a href="{{ url_for('register') }}">
+                                <div class="ui huge teal button">
+                                    Get Started
+                                    <i class="right arrow icon"></i>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -81,7 +93,7 @@
                         About
                     </h4>
                     <div class="ui inverted link list">
-                        <a class="item" href="http://www.github.com/harmon758/WHOA"> Contact Us</a>
+                        <a class="item" href="http://www.github.com/harmon758/WHOA">Contact Us</a>
                     </div>
                 </div>
                 <div class="seven wide column">
