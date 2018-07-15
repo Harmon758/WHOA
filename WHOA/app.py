@@ -25,7 +25,6 @@ from flask_login import (
 from flask_pymongo import PyMongo
 
 from model import db
-from utils import validate_login_form
 
 app = Flask("angelhack")
 app.config["SECRET_KEY"] = "3871897312"
@@ -145,16 +144,29 @@ def community_dashboard(community_name):
 
 @app.route("/communities/<string:community_name>/login", methods=("GET", "POST"))
 def community_login(community_name):
-	if request.method == "POST":
-		errors = validate_login_form(dict(request.form), db_connector, community_name)
-		if errors:
-			for error in errors:
-				flash(error)
-			return redirect(url_for(f"/communities/{community_name}/login"))
+	if request.method == "GET":
+		return render_template("login.html")
+	
+	if "@" not in request.form["email"]:
+		flash("Please enter a valid email.")
+		return redirect(url_for(f"/communities/{community_name}/login"))
+	
+	try:
+		if request.form["is_admin"]:
+			valid = db_connector.check_admin_password(request.form["email"], request.form["password"])
 		else:
-			login_user()
-			return redirect(f"/communities/{community_name}")
-	return render_template("login.html")
+			community = db_connector.get_community(name = community_name)
+			valid = community.check_user_password(request.form["email"], request.form["password"])
+	except db.DatabaseException as e:
+		flash(str(e))
+		return redirect(url_for(f"/communities/{community_name}/login"))
+	
+	if not valid:
+		flash("Password incorrect.")
+		return redirect(url_for(f"/communities/{community_name}/login"))
+	
+	login_user()
+	return redirect(f"/communities/{community_name}")
 	
 
 @app.route("/error")
