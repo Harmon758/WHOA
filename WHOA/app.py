@@ -33,47 +33,17 @@ app.url_map.strict_slashes = False
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = "login"
 
 db_connector = db.WHOADatabase(app)
 
-"""
+
 @login_manager.user_loader
-def user_loader(email):
-	if email not in users:
+def load_user(email):
+	try:
+		return db_connector.get_user(email)
+	except db.DatabaseException:
 		return
-
-	user = Manager()
-	user.id = email  # SamAccountName
-	user.name = users[user.id]  # Real name
-	return user
-
-@login_manager.request_loader
-def request_loader(request):
-	email = request.form.get("email")
-	if email is not None:
-		email = email.split("@")[0]
-		if email not in users:
-			if os.environ["FLASK_ENV"] == "development":
-				print("In request_loader...")
-				print(email)
-			return
-
-		user = Manager()
-		user.id = email  # SamAccountName
-		user.name = users[user.id]  # Real name
-		if _users_manager.is_valid:
-			return user
-
-@login_manager.unauthorized_handler
-def unauthorized_handler():
-	flash("Please login first.")
-	return redirect(url_for("login"))
-"""
-
-@app.route("/")
-def index():
-	return render_template("index.html")
-
 
 """
 @app.route("/logout")
@@ -81,6 +51,11 @@ def logout():
 	logout_user()
 	return render_template("logout.html")
 """
+
+@app.route("/")
+def index():
+	return render_template("index.html")
+
 
 @app.route("/login", methods=("GET", "POST"))
 def login():
@@ -139,6 +114,7 @@ def register():
 
 
 @app.route('/communities/<string:community_name>')
+@login_required
 def community_dashboard(community_name):
 	try:
 		community = db_connector.get_community(community_name)
@@ -148,6 +124,7 @@ def community_dashboard(community_name):
 
 
 @app.route("/communities/<string:community_name>/noticeboard", methods=("GET", "POST"))
+@login_required
 def community_noticeboard(community_name):
 	if request.method == "GET":
 		try:
@@ -158,7 +135,7 @@ def community_noticeboard(community_name):
 		return render_template("noticeboard.html", community_data=community, noticeboard=noticeboard)
 	
 	noticeboard = db_connector.get_noticeboard(community_name)
-	noticeboard.add_notice(poster="User", content=request.form["notice"], timestamp = datetime.datetime.utcnow())
+	noticeboard.add_notice(poster=current_user.name, content=request.form["notice"], timestamp = datetime.datetime.utcnow())
 	return redirect(f"/communities/{community_name}/noticeboard")
 
 
@@ -186,8 +163,11 @@ def community_login(community_name):
 		flash("Password incorrect.")
 		return redirect(f"/communities/{community_name}/login")
 	
-	login_user()
-	return redirect(f"/communities/{community_name}")
+	if is_admin:
+		return redirect(f"/communities/{community_name}/admin")
+	else:
+		login_user(user)
+		return redirect(f"/communities/{community_name}")
 	
 
 @app.route("/error")
