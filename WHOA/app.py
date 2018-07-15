@@ -59,7 +59,7 @@ def login():
 
 
 @app.route("/logout")
-@login_required
+# @login_required
 def logout():
 	logout_user()
 	return render_template("index.html")
@@ -116,7 +116,7 @@ def register():
 
 
 @app.route('/communities/<string:community_name>')
-@login_required
+# @login_required
 def community_dashboard(community_name):
 	try:
 		community = db_connector.get_community(community_name)
@@ -126,7 +126,7 @@ def community_dashboard(community_name):
 
 
 @app.route("/communities/<string:community_name>/noticeboard", methods=("GET", "POST"))
-@login_required
+# @login_required
 def community_noticeboard(community_name):
 	if request.method == "GET":
 		try:
@@ -171,6 +171,12 @@ def community_login(community_name):
 		login_user(user)
 		return redirect(f"/communities/{community_name}")
 	
+
+@app.route("/communities/<string:community_name>/admin")
+def admin(community_name):
+	community = db_connector.get_community(name=community_name)
+	return render_template("admin.html", community_name=community_name, community_data=community)
+
 
 @app.route("/error")
 def error(error_message):
