@@ -94,7 +94,7 @@ def register():
 			for error in errors:
 				flash(error)
 			return redirect(url_for("register"))
-		if request.form["is_admin"]:
+		if "admin_submit" in request.form:
 			return redirect(f"/communities/{request.form['community_name']}/admin")
 		else:
 			return redirect(f"/communities/{request.form['community_name']}")
