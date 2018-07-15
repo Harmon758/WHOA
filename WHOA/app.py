@@ -25,7 +25,7 @@ from flask_login import (
 from flask_pymongo import PyMongo
 
 from model import db
-from utils import validate_login_form, validate_register_form
+from utils import validate_login_form
 
 app = Flask("angelhack")
 app.config["SECRET_KEY"] = "3871897312"
