@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import os
 import sys
 
@@ -143,6 +144,20 @@ def community_dashboard(community_name):
 	except db.DatabaseException as e:
 		return error(f"Unable to find community {community_name}")
 	return render_template("communities.html", community_data=community)
+
+
+@app.route("/communities/<string:community_name>/noticeboard", methods=("GET", "POST"))
+def community_noticeboard(community_name):
+	if request.method == "GET":
+		try:
+			community = db_connector.get_community(community_name)
+		except db.DatabaseException as e:
+			return error(f"Unable to find community {community_name}")
+		return render_template("noticeboard.html", community_data=community)
+	
+	community = db_connector.get_community(name=community_name)
+	community.noticeboard.add_notice(poster="User", content=request.form["notice"], timestamp = datetime.datetime.utcnow())
+	return redirect(f"/communities/{community_name}/noticeboard")
 
 
 @app.route("/communities/<string:community_name>/login", methods=("GET", "POST"))

@@ -1,0 +1,44 @@
+{% extends "dashboard.html" -%}
+{% set active_page = "noticeboard" %}
+{% block row -%}
+<div class="row">
+	<h1 class="ui huge header">
+		Noticeboard
+	</h1>
+</div>
+<div class="ui divider"></div>
+<div class="row">
+	<div class="ui grid">
+		<div class="row">
+			<div class="column">
+				<form method="POST" class="ui form">
+					<div class="field">
+						<label>Notice</label>
+						<textarea id ="notice" name="notice"></textarea>
+					</div>
+					<input class="ui button" type="submit" value="Post", id="post_notice" name="post_notice"></input>
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="ui feed">
+			{% for notice in community_data.noticeboard.list_notices() %}
+				<div class="event">
+					<div class="content">
+						<div class="summary">
+							<a>{{ notice.poster }}</a> posted
+							<div class="date">
+								{{ notice.timestamp }}
+							</div>
+						</div>
+						<div class="extra text">
+							{{ notice.content }}
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
