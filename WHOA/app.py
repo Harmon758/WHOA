@@ -130,7 +130,7 @@ def register():
 			)
 			return redirect(f"/communities/{request.form['community_name']}")
 	except db.DatabaseException as e:
-		flash((str(e))
+		flash(str(e))
 		return redirect(url_for("register"))
 
 
