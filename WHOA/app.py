@@ -88,17 +88,50 @@ def login():
 
 @app.route("/register", methods=("GET", "POST"))
 def register():
-	if request.method == "POST":
-		errors = validate_register_form(dict(request.form), db_connector)
-		if errors:
-			for error in errors:
-				flash(error)
-			return redirect(url_for("register"))
-		if "admin_submit" in request.form:
+	if request.method == "GET":
+		return render_template("register.html")
+	
+	is_admin = "admin_submit" in request.form
+	if is_admin:
+		prefix = "admin_"
+	else:
+		prefix = "user_"
+	
+	errors = False
+	if request.form[prefix + "email_confirm"] != request.form[prefix + "email"]:
+		errors = True
+		flash("Emails must match.")
+	if request.form[prefix + "password_confirm"] != request.form[prefix + "password"]:
+		errors = True
+		flash("Passwords must much.")
+	if "@" not in request.form[prefix + "email"]:
+		errors = True
+		flash("Please enter a valid email.")
+	if errors:
+		return redirect(url_for("register"))
+	
+	try:
+		if is_admin:
+			db_connector.add_community(
+				name=request.form["community_name"],
+				admin_email=request.form["admin_email"],
+				admin_password=request.form["admin_password"],
+				invite_code=request.form["referral"]
+			)
 			return redirect(f"/communities/{request.form['community_name']}/admin")
 		else:
+			community = db_connector.get_community(invite_code = request.form["invite_code"])
+			community.add_user(
+				name=f"{request.form['first_name']} {request.form['last_name']}",
+				email=request.form["user_email"],
+				password=request.form["user_password"],
+				address=request.form["address"],
+				phone_number=request.form["phone_number"]
+			)
 			return redirect(f"/communities/{request.form['community_name']}")
-	return render_template("register.html")
+	except db.DatabaseException as e:
+		flash((str(e))
+		return redirect(url_for("register"))
 
 
 @app.route('/communities/<string:community_name>')
