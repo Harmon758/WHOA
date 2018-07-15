@@ -124,12 +124,13 @@ def register():
 			return redirect(f"/communities/{request.form['community_name']}/admin")
 		else:
 			community = db_connector.get_community(invite_code = request.form["invite_code"])
-			community.add_user(
+			db_connector.add_user(
 				name=f"{request.form['first_name']} {request.form['last_name']}",
 				email=request.form["user_email"],
 				password=request.form["user_password"],
 				address=request.form["address"],
-				phone_number=request.form["phone_number"]
+				phone_number=request.form["phone_number"],
+				community=community["name"]
 			)
 			return redirect(f"/communities/{community.name}")
 	except db.DatabaseException as e:
@@ -153,10 +154,11 @@ def community_noticeboard(community_name):
 			community = db_connector.get_community(community_name)
 		except db.DatabaseException as e:
 			return error(f"Unable to find community {community_name}")
-		return render_template("noticeboard.html", community_data=community)
+		noticeboard = db_connector.get_noticeboard(community_name)
+		return render_template("noticeboard.html", community_data=community, noticeboard=noticeboard)
 	
-	community = db_connector.get_community(name=community_name)
-	community.noticeboard.add_notice(poster="User", content=request.form["notice"], timestamp = datetime.datetime.utcnow())
+	noticeboard = db_connector.get_noticeboard(community_name)
+	noticeboard.add_notice(poster="User", content=request.form["notice"], timestamp = datetime.datetime.utcnow())
 	return redirect(f"/communities/{community_name}/noticeboard")
 
 
@@ -174,8 +176,7 @@ def community_login(community_name):
 		if is_admin:
 			valid = db_connector.check_admin_password(request.form["admin_email"], request.form["admin_password"])
 		else:
-			community = db_connector.get_community(name=community_name)
-			user = community.get_user(request.form["user_email"])
+			user = db_connector.get_user(request.form["user_email"])
 			valid = user.check_password(request.form["user_password"])
 	except db.DatabaseException as e:
 		flash(str(e))

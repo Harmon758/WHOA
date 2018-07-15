@@ -3,6 +3,7 @@ from collections import namedtuple
 import datetime
 
 from flask import Flask
+from flask_login import UserMixin
 from flask_pymongo import PyMongo
 import pymongo
 
@@ -11,6 +12,7 @@ class WHOADatabase(PyMongo):
 	def __init__(self, app):
 		super().__init__(app, "mongodb://localhost:27017/whoa")
 		self.communities = self.db.communities
+		self.users = self.db.users
 	
 	def add_community(self, **kwargs):
 		for required_field in ("name", "admin_email", "admin_password", "invite_code"):
@@ -23,9 +25,7 @@ class WHOADatabase(PyMongo):
 		if self.communities.find_one({"invite_code": kwargs["invite_code"]}):
 			raise DatabaseException("Duplicate invite code")
 		result = self.communities.insert_one(kwargs)
-		community_collection = self.db.create_collection(str(result.inserted_id))
-		noticeboard_collection = self.db.create_collection(f"{result.inserted_id}_nb")
-		return WHOACommunity(kwargs["name"], community_collection, WHOANoticeboard(noticeboard_collection))
+		noticeboard_collection = self.db.create_collection(f"{kwargs['name']}_nb")
 	
 	def get_community(self, name = None, invite_code = None):
 		if not (name or invite_code):
@@ -37,9 +37,8 @@ class WHOADatabase(PyMongo):
 			document = self.communities.find_one({"invite_code": invite_code})
 		if not document:
 			raise DatabaseException("Community not found")
-		community_collection = self.db[str(document["_id"])]
-		noticeboard_collection = self.db[f"{document['_id']}_nb"]
-		return WHOACommunity(document["name"], community_collection, WHOANoticeboard(noticeboard_collection))
+		noticeboard_collection = self.db[f"{document['name']}_nb"]
+		return document
 	
 	def list_communities(self):
 		return self.communities.distinct("name")
@@ -49,40 +48,39 @@ class WHOADatabase(PyMongo):
 		if not document:
 			raise DatabaseException("Admin email not found")
 		return admin_password == document["admin_password"]
-
-
-class WHOACommunity:
-	
-	def __init__(self, name, collection, noticeboard):
-		self.name = name
-		self.collection = collection
-		self.noticeboard = noticeboard
 	
 	def add_user(self, **kwargs):
-		for required_field in ("name", "email", "password", "address", "phone_number"):
+		for required_field in ("name", "email", "password", "address", "phone_number", "community"):
 			if required_field not in kwargs:
 				raise DatabaseException(f"Required field: {required_field}")
-		if self.collection.find_one({"email": kwargs["email"]}):
+		if self.users.find_one({"email": kwargs["email"]}):
 			raise DatabaseException("Duplicate email")
-		self.collection.insert_one(kwargs)
-		return WHOAUser(name, email, password, address, phone_number)
+		self.users.insert_one(kwargs)
+		return WHOAUser(kwargs["name"], kwargs["email"], kwargs["password"], 
+						kwargs["address"], kwargs["phone_number"], kwargs["community"])
 	
 	def get_user(self, email):
-		document = self.collections.find_one({"email": kwargs["email"]})
+		document = self.users.find_one({"email": kwargs["email"]})
 		if not document:
 			raise DatabaseException("User not found")
 		return WHOAUser(document["name"], document["email"], document["password"], 
-						document["address"], document["phone_number"])
-
-
-class WHOAUser():
+						document["address"], document["phone_number"], document["community"])
 	
-	def __init__(self, name, email, password, address, phone_number):
+	def get_noticeboard(self, community_name):
+		if f"{community_name}_nb" not in self.db.collection_names():
+			raise DatabaseException("Noticeboard not found")
+		return WHOANoticeboard(self.db[f"{community_name}_nb"])
+
+
+class WHOAUser(UserMixin):
+	
+	def __init__(self, name, email, password, address, phone_number, community):
 		self.name = name
 		self.email = email
 		self.password = password
 		self.address = address
 		self.phone_number = phone_number
+		self.community = community
 	
 	def get_id(self):
 		return self.email
@@ -122,14 +120,15 @@ class DatabaseException(Exception):
 if __name__ == "__main__":
 	db = WHOADatabase(Flask(__name__))
 	community = db.add_community(name = "HOA1", admin_email = "Bob@bob.com", admin_password = "badpassword", invite_code = "abc")
-	community.add_user(name = "Joe", email = "Joe@joe.com", password = "goodpassword", address = "666 Sixth Street. #6", phone_number = "666-666-6666")
+	user = db.add_user(name = "Joe", email = "Joe@joe.com", password = "goodpassword", address = "666 Sixth Street. #6", phone_number = "666-666-6666", community = "HOA1")
 	community = db.get_community(invite_code = "abc")
 	assert db.check_admin_password("Bob@bob.com", "badpassword")
 	assert not db.check_admin_password("Bob@bob.com", "password")
-	assert community.check_user_password("Joe@joe.com", "goodpassword")
-	assert not community.check_user_password("Joe@joe.com", "password")
+	assert user.check_password("goodpassword")
+	assert not user.check_password("password")
 	assert db.list_communities() == ["HOA1"]
-	community.noticeboard.add_notice(poster = "Joe", content = "Hello", timestamp = datetime.datetime.utcnow())
-	community.noticeboard.add_notice(poster = "Joe", content = "Hello v2", timestamp = datetime.datetime.utcnow())
-	assert len(community.noticeboard.list_notices()) == 2
+	noticeboard = db.get_noticeboard("HOA1")
+	noticeboard.add_notice(poster = "Joe", content = "Hello", timestamp = datetime.datetime.utcnow())
+	noticeboard.add_notice(poster = "Joe", content = "Hello v2", timestamp = datetime.datetime.utcnow())
+	assert len(noticeboard.list_notices()) == 2
 
