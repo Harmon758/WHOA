@@ -132,7 +132,7 @@ def register():
 				phone_number=request.form["phone_number"],
 				community=community["name"]
 			)
-			return redirect(f"/communities/{community.name}")
+			return redirect(f"/communities/{community['name']}")
 	except db.DatabaseException as e:
 		flash(str(e))
 		return redirect(url_for("register"))
