@@ -25,7 +25,7 @@ from flask_login import (
 from flask_pymongo import PyMongo
 
 from model import db
-from utils import validate_form
+from utils import validate_login_form, validate_register_form
 
 app = Flask("angelhack")
 app.config["SECRET_KEY"] = "3871897312"
@@ -74,20 +74,6 @@ def index():
 	return render_template("index.html")
 
 
-@app.route("/login", methods=("GET", "POST"))
-def login():
-	if request.method == "POST":
-		errors = validate_form(dict(request.form), "login", db_connector)
-		if errors:
-			for error in errors:
-				flash(error)
-			redirect(url_for("login"))
-		else:
-			login_user()
-		return(url_for("index"))
-	return render_template("login.html")
-
-
 """
 @app.route("/logout")
 def logout():
@@ -99,7 +85,7 @@ def logout():
 @app.route("/register", methods=("GET", "POST"))
 def register():
 	if request.method == "POST":
-		errors = validate_form(dict(request.form), "register", db_connector)
+		errors = validate_register_form(dict(request.form), db_connector)
 		if errors:
 			for error in errors:
 				flash(error)
@@ -118,6 +104,20 @@ def community_dashboard(community_name):
 	except db.DatabaseException as e:
 		return error(f"Unable to find community {community_name}")
 	return render_template("communities.html", community_data=community)
+
+
+@app.route("/communities/<string:community_name>/login", methods=("GET", "POST"))
+def login(community_name):
+	if request.method == "POST":
+		errors = validate_login_form(dict(request.form), db_connector, community_name)
+		if errors:
+			for error in errors:
+				flash(error)
+			return redirect(url_for(f"/communities/{community_name}/login"))
+		else:
+			login_user()
+			return redirect(f"/communities/{community_name}")
+	return render_template("login.html")
 	
 
 @app.route("/error")
