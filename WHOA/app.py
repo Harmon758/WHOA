@@ -175,7 +175,8 @@ def community_login(community_name):
 			valid = db_connector.check_admin_password(request.form["admin_email"], request.form["admin_password"])
 		else:
 			community = db_connector.get_community(name=community_name)
-			valid = community.check_user_password(request.form["user_email"], request.form["user_password"])
+			user = community.get_user(request.form["user_email"])
+			valid = user.check_password(request.form["user_password"])
 	except db.DatabaseException as e:
 		flash(str(e))
 		return redirect(f"/communities/{community_name}/login")

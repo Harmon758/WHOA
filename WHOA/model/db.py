@@ -65,12 +65,30 @@ class WHOACommunity:
 		if self.collection.find_one({"email": kwargs["email"]}):
 			raise DatabaseException("Duplicate email")
 		self.collection.insert_one(kwargs)
+		return WHOAUser(name, email, password, address, phone_number)
 	
-	def check_user_password(self, email, password):
-		document = self.collection.find_one({"email": email})
+	def get_user(self, email):
+		document = self.collections.find_one({"email": kwargs["email"]})
 		if not document:
-			raise DatabaseException("Email not found")
-		return password == document["password"]
+			raise DatabaseException("User not found")
+		return WHOAUser(document["name"], document["email"], document["password"], 
+						document["address"], document["phone_number"])
+
+
+class WHOAUser():
+	
+	def __init__(self, name, email, password, address, phone_number):
+		self.name = name
+		self.email = email
+		self.password = password
+		self.address = address
+		self.phone_number = phone_number
+	
+	def get_id(self):
+		return self.email
+	
+	def check_password(self, password):
+		return password == self.password
 
 
 Notice = namedtuple("Notice", "poster, content, timestamp, other")
