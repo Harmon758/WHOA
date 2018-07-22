@@ -21,15 +21,15 @@
 
 				<form method="POST" class="ui large form">
 					<div class="ui stacked segment">
-                        {% with errors = get_flashed_messages() -%} 
-                        {% if errors %}
-                        <ul>
-                            {% for error in errors %}
-                            <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                        {%- endif %} 
-                        {%- endwith -%}
+						{% with errors = get_flashed_messages() -%} 
+						{% if errors %}
+						<ul>
+							{% for error in errors %}
+							<li>{{ error }}</li>
+							{% endfor %}
+						</ul>
+						{%- endif %} 
+						{%- endwith -%}
 						<div class="field">
 							<div class="ui left icon input">
 								<i class="user icon"></i>
@@ -80,7 +80,7 @@
 							</div>
 						</div>
 						<input type="submit" value="Login" name="admin_submit" id="admin_submit" class="ui fluid large teal button"></input>
-                    </div>
+					</div>
 				</form>
 			</div>
 		</div>
